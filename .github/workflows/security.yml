@@ -1,0 +1,45 @@
+name: Security
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-and-secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Scan secrets
+        uses: gitleaks/gitleaks-action@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Ruff and Bandit
+        run: python -m pip install --disable-pip-version-check ruff bandit
+
+      - name: Lint Python
+        run: ruff check --output-format=github .
+
+      - name: Format check
+        run: ruff format --check .
+
+      - name: Scan Python for security issues
+        run: |
+          targets=""
+          [ -d server ] && targets="$targets server"
+          [ -d edge ] && targets="$targets edge"
+          if [ -n "$targets" ]; then
+            bandit -q -r $targets
+          fi

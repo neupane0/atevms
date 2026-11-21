@@ -1,0 +1,34 @@
+[project]
+name = "atevms"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+  "cryptography==45.0.7",
+  "pydantic==2.11.7",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest==8.4.1",
+]
+dev = [
+  "mypy==1.15.0",
+  "bandit==1.8.3",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["server"]
+testpaths = ["server/tests"]
+
+[tool.ruff]
+line-length = 120
+src = ["server"]
+
+[tool.ruff.lint]
+ignore = ["UP042"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.setuptools.packages.find]
+include = ["server*", "edge*"]
